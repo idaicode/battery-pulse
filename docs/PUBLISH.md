@@ -319,7 +319,8 @@ git push && git push origin v1.0.1
 | `file is 114 MB; this exceeds GitHub's file size limit of 100 MB` | `dist/` 被提交了 | `git rm -r --cached dist` 后再 commit；已进历史的要 `git filter-repo` |
 | `LF will be replaced by CRLF` | Windows 换行提示 | 忽略即可；`.editorconfig` 已规定 bat 用 CRLF |
 | 中文文件名显示成乱码 | 编码问题 | `git config --global core.quotepath false` |
-| push 卡住不动 | 网络到 GitHub 不通 | 配代理：`git config --global http.proxy http://127.0.0.1:7890` |
+| push 卡住不动 / `Failed to connect to github.com:443` | 直连被墙，或环境变量里有个不通的代理 | 见下一行 |
+| `CONNECT tunnel failed, response 502`<br>`schannel: failed to receive handshake` | 走了一个不支持 github.com 的代理（常见于只放行个别域名的本地代理） | 先探端口：`curl -x http://127.0.0.1:7897 -o NUL -w "%{http_code}" https://github.com` 返回 200 才算能用；然后 `git config --local http.proxy http://127.0.0.1:7897`（`--local` 只影响本仓库，不会进版本库）。注意 **git 配置优先于环境变量**，所以配了 config 就一定走它 |
 | Actions 打包出的 exe 起不来 | 缺 WebView2 运行时 | 目标机装 [WebView2 Runtime](https://developer.microsoft.com/microsoft-edge/webview2/)（Win11 自带） |
 
 ---

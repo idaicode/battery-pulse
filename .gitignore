@@ -1,0 +1,48 @@
+# ---------- Python ----------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+build/
+dist/
+release/
+pip-wheel-metadata/
+
+# ---------- 虚拟环境 ----------
+.venv/
+venv/
+env/
+ENV/
+
+# ---------- 运行时数据（含本机 MAC、日志、WebView2 缓存，绝不入库）----------
+data/
+*.log
+!docs/**/*.log
+
+# ---------- 打包/工具缓存 ----------
+*.spec.bak
+*.manifest
+*.toc
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# ---------- 编辑器 / 系统 ----------
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+.idea/
+*.swp
+*~
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# ---------- 临时截图（开发调试产物）----------
+shots/dev/

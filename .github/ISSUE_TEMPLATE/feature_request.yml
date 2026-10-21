@@ -1,0 +1,27 @@
+name: 功能建议
+description: 新设备支持、界面改进、行为调整
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: 你想解决什么问题
+      description: 描述使用场景，而不是直接给方案
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: 你希望它怎么工作
+  - type: input
+    id: device
+    attributes:
+      label: 涉及的外设（如需新设备支持）
+      placeholder: 品牌 + 型号 + 连接方式（2.4G / 蓝牙）
+  - type: checkboxes
+    id: contribute
+    attributes:
+      label: 参与意愿
+      options:
+        - label: 我可以帮忙测试
+        - label: 我可以提 PR

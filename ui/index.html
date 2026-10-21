@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>设备电量 · Battery Pulse</title>
+<style>
+  :root{
+    --bg:#F0EEE6;
+    --surface:#FAF9F5;
+    --surface-2:#F5F3EA;
+    --ink:#191917;
+    --ink-2:#6E6C64;
+    --ink-3:#9B988D;
+    --line:#E3E0D5;
+    --line-strong:#D6D2C4;
+    --accent:#C96442;
+    --accent-hover:#AE5334;
+    --accent-soft:#F3E3DB;
+    --warn:#C08636;
+    --crit:#B4453A;
+    --good:#4E6B57;
+    --radius:18px;
+    --shadow:0 1px 2px rgba(25,25,23,.04), 0 10px 30px rgba(25,25,23,.045);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    font-size:14px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--accent-soft);}
+  .wrap{max-width:880px;margin:0 auto;padding:44px 26px 64px;}
+
+  /* ---------- 内嵌窗口标题栏（仅 WebView2 外壳下显示） ---------- */
+  .titlebar{display:none;}
+  body.embed .titlebar{
+    display:flex;align-items:center;gap:10px;height:38px;padding:0 6px 0 14px;
+    background:var(--bg);border-bottom:1px solid var(--line);
+    position:sticky;top:0;z-index:50;user-select:none;
+  }
+  body.embed .tb-title{font-size:11.5px;letter-spacing:.14em;color:var(--ink-2);font-weight:600;}
+  body.embed .tb-mark{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .tb-drag{flex:1;height:100%;}
+  .tb-btn{
+    width:30px;height:26px;border:0;border-radius:7px;background:transparent;color:var(--ink-2);
+    font:inherit;font-size:13px;line-height:1;cursor:pointer;display:grid;place-items:center;
+    transition:background .15s,color .15s;
+  }
+  .tb-btn:hover{background:var(--surface-2);color:var(--ink);}
+  .tb-btn.tb-close:hover{background:var(--crit);color:#fff;}
+  .tb-btn.on{color:var(--accent);background:var(--accent-soft);}
+  body.embed .wrap{padding-top:16px;}
+  body.embed .top{padding-bottom:14px;border-bottom:0;}
+  body.embed .hero{padding:10px 0 22px;}
+  body.embed .top .brand{visibility:hidden;}
+
+  /* ---------- 顶栏 ---------- */
+  .top{display:flex;align-items:center;justify-content:space-between;padding-bottom:22px;border-bottom:1px solid var(--line);}
+  .brand{display:flex;align-items:center;gap:9px;font-size:11px;letter-spacing:.16em;color:var(--ink-2);font-weight:600;}
+  .mark{width:15px;height:15px;border-radius:50%;border:1.5px solid var(--accent);display:inline-flex;align-items:center;justify-content:center;}
+  .mark::after{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent);}
+  .live{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink-2);}
+  .live-dot{width:6px;height:6px;border-radius:50%;background:var(--good);box-shadow:0 0 0 3px rgba(78,107,87,.12);}
+  .live.off .live-dot{background:var(--ink-3);box-shadow:none;}
+
+  /* ---------- 标题 ---------- */
+  .hero{padding:34px 0 26px;}
+  h1{
+    font-family:Georgia,"Times New Roman","Songti SC","STSong",serif;
+    font-size:40px;font-weight:400;letter-spacing:-.018em;margin:0 0 10px;line-height:1.15;
+  }
+  .lede{margin:0;color:var(--ink-2);font-size:13.5px;max-width:52ch;}
+
+  /* ---------- 设备卡 ---------- */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:16px;margin-bottom:22px;}
+  .card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+  }
+  .device{
+    display:flex;align-items:center;gap:20px;
+    padding:20px 22px;
+    transition:transform .25s cubic-bezier(.22,.61,.36,1), box-shadow .25s;
+  }
+  .device:hover{transform:translateY(-2px);box-shadow:0 2px 4px rgba(25,25,23,.05),0 16px 38px rgba(25,25,23,.07);}
+  .gauge{position:relative;width:92px;height:92px;flex:0 0 92px;}
+  .gauge svg{width:92px;height:92px;transform:rotate(-90deg);}
+  .gauge .track{fill:none;stroke:#E8E4D7;stroke-width:7;}
+  .gauge .fill{
+    fill:none;stroke:var(--good);stroke-width:7;stroke-linecap:round;
+    stroke-dasharray:263.9;stroke-dashoffset:263.9;
+    transition:stroke-dashoffset .9s cubic-bezier(.22,.61,.36,1), stroke .4s;
+  }
+  .gauge-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;line-height:1;}
+  /* 内层负责基线对齐，外层负责垂直居中，数字才是光学正中的 */
+  .gauge-inner{display:inline-flex;align-items:baseline;gap:1px;line-height:1;transform:translateY(-1.5px);}
+  .gauge-num .pct{font-size:24px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1;}
+  .gauge-num .unit{font-size:11px;color:var(--ink-3);line-height:1;}
+  .gauge-num .dash{font-size:20px;color:var(--ink-3);line-height:1;}
+
+  .meta{min-width:0;flex:1;}
+  .meta h3{
+    margin:0 0 5px;font-size:14.5px;font-weight:600;letter-spacing:-.01em;line-height:1.32;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  }
+  .chip{
+    flex:0 0 auto;font-size:10.5px;letter-spacing:.04em;color:var(--ink-2);
+    background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:1px 8px;
+  }
+  .meta .status{display:flex;align-items:center;gap:6px;margin:0;font-size:12.5px;color:var(--ink-2);}
+  .meta .dot{width:5px;height:5px;border-radius:50%;background:var(--good);flex:0 0 auto;}
+  .meta .sub{display:flex;align-items:center;gap:8px;margin:5px 0 0;font-size:11.5px;color:var(--ink-3);flex-wrap:wrap;}
+
+  .device.is-low .gauge .fill{stroke:var(--warn);}
+  .device.is-low .meta .dot{background:var(--warn);}
+  .device.is-crit .gauge .fill{stroke:var(--crit);}
+  .device.is-crit .meta .dot{background:var(--crit);}
+  .device.is-off{opacity:.62;}
+  .device.is-off .gauge .fill{stroke:transparent;}
+  .device.is-off .meta .dot{background:var(--ink-3);}
+  .device.is-off .gauge-num .pct{color:var(--ink-3);}
+
+  /* 空状态 */
+  .empty{
+    grid-column:1/-1;padding:38px 24px;text-align:center;
+    background:var(--surface);border:1px dashed var(--line-strong);border-radius:var(--radius);
+    color:var(--ink-2);
+  }
+  .empty strong{display:block;font-size:14px;color:var(--ink);margin-bottom:6px;font-weight:600;}
+
+  /* ---------- 设置面板 ---------- */
+  .panel{padding:6px 22px;}
+  .panel-row{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:18px 0;border-bottom:1px solid var(--line);}
+  .panel-row:last-child{border-bottom:none;}
+  .panel h2{margin:0;font-size:13.5px;font-weight:600;letter-spacing:-.005em;}
+  .hint{margin:3px 0 0;font-size:12px;color:var(--ink-3);max-width:46ch;}
+  .threshold{display:flex;align-items:center;gap:12px;flex:0 0 auto;}
+  .badge{
+    min-width:46px;text-align:center;font-size:12px;font-weight:600;font-variant-numeric:tabular-nums;
+    color:var(--accent);background:var(--accent-soft);border-radius:8px;padding:4px 8px;
+  }
+  input[type=range]{
+    -webkit-appearance:none;width:150px;height:3px;border-radius:99px;
+    background:linear-gradient(90deg,var(--accent) 0%,var(--accent) var(--p,33%),var(--line-strong) var(--p,33%));
+    outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:15px;height:15px;border-radius:50%;
+    background:var(--surface);border:1.5px solid var(--accent);cursor:pointer;
+    box-shadow:0 1px 3px rgba(25,25,23,.12);transition:transform .15s;
+  }
+  input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.12);}
+
+  .switches{display:flex;gap:22px;flex-wrap:wrap;justify-content:flex-end;}
+  .switch{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12.5px;color:var(--ink-2);user-select:none;}
+  .switch input{display:none;}
+  .tracklet{width:34px;height:19px;border-radius:99px;background:var(--line-strong);position:relative;transition:background .2s;flex:0 0 auto;}
+  .tracklet::after{
+    content:"";position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;
+    background:#fff;box-shadow:0 1px 2px rgba(25,25,23,.2);transition:transform .2s cubic-bezier(.22,.61,.36,1);
+  }
+  .switch.on .tracklet{background:var(--accent);}
+  .switch.on .tracklet::after{transform:translateX(15px);}
+
+  .actions{display:flex;gap:9px;flex-wrap:wrap;justify-content:flex-end;}
+  .btn{
+    font:inherit;font-size:12.5px;padding:7px 14px;border-radius:9px;cursor:pointer;
+    border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);
+    transition:background .16s,border-color .16s,transform .1s;
+  }
+  .btn:hover{background:var(--surface-2);border-color:#C9C4B3;}
+  .btn:active{transform:scale(.985);}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .btn.primary:hover{background:var(--accent-hover);border-color:var(--accent-hover);}
+  .btn[disabled]{opacity:.5;cursor:default;}
+
+  /* ---------- 事件 ---------- */
+  .log{padding:18px 22px;margin-top:16px;}
+  .log h2{margin:0 0 10px;font-size:13.5px;font-weight:600;}
+  .log ul{list-style:none;margin:0;padding:0;}
+  .log li{display:flex;gap:12px;font-size:12.5px;color:var(--ink-2);padding:7px 0;border-bottom:1px solid var(--line);}
+  .log li:last-child{border-bottom:none;}
+  .log time{color:var(--ink-3);font-variant-numeric:tabular-nums;flex:0 0 auto;}
+  .log .k{width:5px;height:5px;border-radius:50%;background:var(--ink-3);margin-top:7px;flex:0 0 auto;}
+  .log .k.warn{background:var(--warn);}
+  .log .k.critical{background:var(--crit);}
+  .log .k.info{background:var(--good);}
+  .log .placeholder{color:var(--ink-3);border:none;}
+
+  /* ---------- 页脚 ---------- */
+  .foot{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:26px;padding-top:16px;border-top:1px solid var(--line);font-size:11.5px;color:var(--ink-3);}
+  .foot b{font-weight:600;color:var(--ink-2);font-variant-numeric:tabular-nums;}
+
+  /* 轻提示 */
+  #snack{
+    position:fixed;left:50%;bottom:26px;transform:translate(-50%,14px);
+    background:#1F1E1C;color:#F5F3EC;font-size:12.5px;padding:9px 16px;border-radius:10px;
+    opacity:0;pointer-events:none;transition:opacity .22s,transform .22s;z-index:9;
+    box-shadow:0 10px 30px rgba(0,0,0,.18);
+  }
+  #snack.show{opacity:1;transform:translate(-50%,0);}
+
+  @media (max-width:520px){
+    .wrap{padding:30px 18px 48px;}
+    h1{font-size:32px;}
+    .panel-row{flex-direction:column;align-items:flex-start;gap:10px;}
+    .switches,.actions{justify-content:flex-start;}
+    .device{gap:14px;padding:16px;}
+    .gauge,.gauge svg{width:74px;height:74px;flex-basis:74px;}
+    .gauge-num .pct{font-size:20px;}
+  }
+</style>
+</head>
+<body>
+<div class="titlebar" id="titlebar">
+  <span class="tb-mark"></span>
+  <span class="tb-title">BATTERY PULSE</span>
+  <div class="tb-drag pywebview-drag-region"></div>
+  <button class="tb-btn" id="tb-pin" title="置顶显示">
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+      <circle cx="6" cy="3.9" r="2.5"/><path d="M6 6.4V11"/>
+    </svg>
+  </button>
+  <button class="tb-btn tb-close" id="tb-close" title="隐藏到托盘">✕</button>
+</div>
+<main class="wrap">
+  <header class="top">
+    <div class="brand"><span class="mark"></span>BATTERY PULSE</div>
+    <div class="live" id="live"><span class="live-dot"></span><span id="live-text">同步中</span></div>
+  </header>
+
+  <section class="hero">
+    <h1>设备电量</h1>
+    <p class="lede">直连读取罗技 2.4G 接收器与蓝牙低功耗设备的电量，低于阈值时弹出系统提醒。</p>
+  </section>
+
+  <section class="grid" id="devices">
+    <div class="empty"><strong>正在扫描设备…</strong>插上 2.4G 接收器或连接蓝牙设备后会自动出现</div>
+  </section>
+
+  <section class="card panel">
+    <div class="panel-row">
+      <div>
+        <h2>预警阈值</h2>
+        <p class="hint">低于该值提醒一次；继续跌到临界值 10% 以下再提醒一次。</p>
+      </div>
+      <div class="threshold">
+        <input id="threshold" type="range" min="5" max="60" step="5" value="20">
+        <span class="badge" id="threshold-val">20%</span>
+      </div>
+    </div>
+
+    <div class="panel-row">
+      <div>
+        <h2>提醒方式</h2>
+        <p class="hint">同一设备同一档位 30 分钟内不重复打扰。</p>
+      </div>
+      <div class="switches">
+        <label class="switch"><input type="checkbox" id="t-notify"><span class="tracklet"></span><span>系统通知</span></label>
+        <label class="switch"><input type="checkbox" id="t-sound"><span class="tracklet"></span><span>提示音</span></label>
+        <label class="switch"><input type="checkbox" id="t-lp"><span class="tracklet"></span><span>低功耗</span></label>
+      </div>
+    </div>
+
+    <div class="panel-row">
+      <div>
+        <h2>操作</h2>
+        <p class="hint" id="action-hint">界面关闭后自动降频轮询，把 CPU 和内存让出来。</p>
+      </div>
+      <div class="actions">
+        <button class="btn" id="btn-test">测试提醒</button>
+        <button class="btn" id="btn-trim">释放内存</button>
+        <button class="btn" id="btn-scan">扫描蓝牙</button>
+        <button class="btn primary" id="btn-refresh">立即刷新</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="card log">
+    <h2>事件</h2>
+    <ul id="events"><li class="placeholder">暂无事件</li></ul>
+  </section>
+
+  <footer class="foot">
+    <span>进程占用 <b id="rss">—</b> · 峰值 <b id="peak">—</b> · 轮询 <b id="interval">—</b> · 托盘 <b id="tray">—</b></span>
+    <span>最近同步 <b id="last">—</b> · 运行 <b id="uptime">—</b></span>
+  </footer>
+</main>
+<div id="snack"></div>
+
+<script>
+(function () {
+  const R = 42, CIRC = 2 * Math.PI * R;
+  const $ = (s) => document.querySelector(s);
+  const grid = $('#devices');
+  const cards = new Map();
+  let pollTimer = null;
+  let lastState = null;
+
+  document.querySelectorAll('.gauge .fill').forEach(() => {});
+
+  async function api(path, body) {
+    const opt = body === undefined ? {} : {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+    };
+    const res = await fetch(path, opt);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return res.json();
+  }
+
+  function snack(text) {
+    const el = $('#snack');
+    el.textContent = text;
+    el.classList.add('show');
+    clearTimeout(el._t);
+    el._t = setTimeout(() => el.classList.remove('show'), 2200);
+  }
+
+  function ago(ts) {
+    if (!ts) return '—';
+    const s = Math.max(0, Math.round(Date.now() / 1000 - ts));
+    if (s < 10) return '刚刚';
+    if (s < 60) return s + ' 秒前';
+    if (s < 3600) return Math.floor(s / 60) + ' 分钟前';
+    return Math.floor(s / 3600) + ' 小时前';
+  }
+
+  function dur(sec) {
+    if (!sec && sec !== 0) return '—';
+    if (sec < 60) return sec + ' 秒';
+    if (sec < 3600) return Math.floor(sec / 60) + ' 分钟';
+    const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60);
+    return m ? h + ' 小时 ' + m + ' 分' : h + ' 小时';
+  }
+
+  function buildCard(d) {
+    const el = document.createElement('article');
+    el.className = 'card device';
+    el.innerHTML = `
+      <div class="gauge">
+        <svg viewBox="0 0 100 100" aria-hidden="true">
+          <circle class="track" cx="50" cy="50" r="${R}"></circle>
+          <circle class="fill" cx="50" cy="50" r="${R}" style="stroke-dasharray:${CIRC.toFixed(1)};stroke-dashoffset:${CIRC.toFixed(1)}"></circle>
+        </svg>
+        <div class="gauge-num"><span class="gauge-inner"><span class="pct">—</span><span class="unit">%</span></span></div>
+      </div>
+      <div class="meta">
+        <h3></h3>
+        <p class="status"><i class="dot"></i><span class="st"></span></p>
+        <p class="sub"><span class="chip"></span><span class="sync"></span></p>
+      </div>`;
+    return el;
+  }
+
+  function updateCard(el, d, cfg) {
+    const pct = d.percent;
+    const num = el.querySelector('.gauge-num');
+    const fill = el.querySelector('.fill');
+
+    el.classList.toggle('is-off', !d.online);
+    el.classList.toggle('is-low', d.online && pct !== null && pct <= cfg.warn_threshold && pct > cfg.critical_threshold);
+    el.classList.toggle('is-crit', d.online && pct !== null && pct <= cfg.critical_threshold);
+
+    if (pct === null || pct === undefined) {
+      num.innerHTML = '<span class="gauge-inner"><span class="dash">—</span></span>';
+      fill.style.strokeDashoffset = CIRC.toFixed(1);
+    } else {
+      num.innerHTML = '<span class="gauge-inner"><span class="pct">' + Math.round(pct) + '</span><span class="unit">%</span></span>';
+      fill.style.strokeDashoffset = (CIRC * (1 - Math.max(0, Math.min(100, pct)) / 100)).toFixed(1);
+    }
+
+    el.querySelector('h3').textContent = d.name;
+    el.querySelector('.chip').textContent = d.transport;
+    el.querySelector('.st').textContent = d.status + (d.note ? ' · ' + d.note : '');
+    el.querySelector('.sync').textContent = d.online ? ('同步于 ' + ago(d.updated)) : (d.note || '离线');
+  }
+
+  function renderDevices(s) {
+    const cfg = s.config;
+    const ids = new Set();
+    if (!s.devices.length) {
+      grid.innerHTML = '<div class="empty"><strong>没有检测到设备</strong>插上罗技接收器，或把键盘/鼠标连到蓝牙后点「扫描蓝牙」</div>';
+      cards.clear();
+      return;
+    }
+    const placeholder = grid.querySelector('.empty');
+    if (placeholder) placeholder.remove();
+
+    s.devices.forEach((d) => {
+      ids.add(d.id);
+      let el = cards.get(d.id);
+      if (!el) {
+        el = buildCard(d);
+        cards.set(d.id, el);
+        grid.appendChild(el);
+      }
+      updateCard(el, d, cfg);
+    });
+
+    cards.forEach((el, id) => {
+      if (!ids.has(id)) { el.remove(); cards.delete(id); }
+    });
+  }
+
+  function renderEvents(events) {
+    const ul = $('#events');
+    if (!events || !events.length) {
+      ul.innerHTML = '<li class="placeholder">暂无事件</li>';
+      return;
+    }
+    ul.innerHTML = events.slice().reverse().map((e) =>
+      '<li><i class="k ' + e.kind + '"></i><time>' + e.ts + '</time><span>' + e.text + '</span></li>'
+    ).join('');
+  }
+
+  function render(s) {
+    lastState = s;
+    renderDevices(s);
+    renderEvents(s.meta.events);
+
+    $('#rss').textContent = s.meta.rss_mb.toFixed(1) + ' MB';
+    $('#peak').textContent = s.meta.peak_rss_mb.toFixed(1) + ' MB';
+    $('#interval').textContent = s.meta.interval + 's';
+    const trayN = s.meta.tray_icons;
+    $('#tray').textContent = trayN ? trayN + ' 个' : '未启用';
+    $('#last').textContent = s.meta.last_refresh || '—';
+    $('#uptime').textContent = dur(s.meta.uptime);
+
+    const live = $('#live');
+    live.classList.remove('off');
+    $('#live-text').textContent = s.devices.length
+      ? (s.devices.filter((d) => d.online).length + '/' + s.devices.length + ' 在线 · ' + s.meta.interval + 's')
+      : '等待设备';
+
+    const th = $('#threshold');
+    if (document.activeElement !== th) {
+      th.value = s.config.warn_threshold;
+      paintRange(th);
+    }
+    $('#threshold-val').textContent = s.config.warn_threshold + '%';
+    setSwitch('t-notify', !!s.config.notify);
+    setSwitch('t-sound', !!s.config.sound);
+    setSwitch('t-lp', !!s.config.low_power);
+  }
+
+  function setSwitch(id, on) {
+    const input = document.getElementById(id);
+    if (!input) return;
+    input.checked = on;
+    const label = input.closest('.switch');
+    if (label) label.classList.toggle('on', on);
+  }
+
+  function paintRange(el) {
+    const p = (el.value - el.min) / (el.max - el.min) * 100;
+    el.style.setProperty('--p', p + '%');
+  }
+
+  async function tick() {
+    try {
+      render(await api('/api/state'));
+    } catch (e) {
+      $('#live').classList.add('off');
+      $('#live-text').textContent = '服务未响应';
+    }
+  }
+
+  function schedule() {
+    clearInterval(pollTimer);
+    pollTimer = setInterval(tick, 4000);
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      clearInterval(pollTimer);
+    } else {
+      tick();
+      schedule();
+    }
+  });
+
+  // ---- 交互 ----
+  const th = $('#threshold');
+  th.addEventListener('input', () => {
+    paintRange(th);
+    $('#threshold-val').textContent = th.value + '%';
+  });
+  th.addEventListener('change', async () => {
+    await api('/api/config', { warn_threshold: +th.value });
+    snack('阈值已设为 ' + th.value + '%');
+    tick();
+  });
+
+  ['notify', 'sound', 'lp'].forEach((k) => {
+    const ids = { notify: '#t-notify', sound: '#t-sound', lp: '#t-lp' };
+    const keys = { notify: 'notify', sound: 'sound', lp: 'low_power' };
+    $(ids[k]).addEventListener('change', async (e) => {
+      e.target.closest('.switch').classList.toggle('on', e.target.checked);
+      await api('/api/config', { [keys[k]]: e.target.checked });
+      if (k === 'lp') snack(e.target.checked ? '已切到低功耗：120 秒轮询' : '已恢复常规轮询');
+      tick();
+    });
+  });
+
+  $('#btn-refresh').addEventListener('click', async (e) => {
+    e.target.disabled = true;
+    e.target.textContent = '刷新中…';
+    try {
+      render(await api('/api/refresh', {}));
+      snack('已同步');
+    } finally {
+      e.target.disabled = false;
+      e.target.textContent = '立即刷新';
+    }
+  });
+
+  $('#btn-scan').addEventListener('click', async (e) => {
+    e.target.disabled = true;
+    e.target.textContent = '扫描中…';
+    try {
+      const r = await api('/api/scan', {});
+      render(r.state);
+      snack(r.found.length ? ('发现 ' + r.found.length + ' 个可读电池的蓝牙设备') : '没有发现新的蓝牙设备');
+    } finally {
+      e.target.disabled = false;
+      e.target.textContent = '扫描蓝牙';
+    }
+  });
+
+  $('#btn-trim').addEventListener('click', async () => {
+    const r = await api('/api/trim', {});
+    render(r.state);
+    snack('工作集 ' + r.result.before_mb + ' MB → ' + r.result.after_mb + ' MB');
+  });
+
+  $('#btn-test').addEventListener('click', async () => {
+    await api('/api/test-notify', {});
+    snack('已发送测试通知');
+  });
+
+  tick();
+  schedule();
+})();
+
+/* ---------- 内嵌窗口（WebView2 外壳）下的标题栏行为 ---------- */
+(function () {
+  let bound = false;
+  function init() {
+    if (bound || !window.pywebview || !window.pywebview.api) return false;
+    bound = true;
+    document.body.classList.add('embed');
+    const api = window.pywebview.api;
+
+    const pin = document.getElementById('tb-pin');
+    let pinned = localStorage.getItem('bp-pinned') === '1';
+    if (pinned) pin.classList.add('on');
+    api.set_on_top(pinned);
+
+    pin.addEventListener('click', () => {
+      pinned = !pinned;
+      pin.classList.toggle('on', pinned);
+      localStorage.setItem('bp-pinned', pinned ? '1' : '0');
+      api.set_on_top(pinned);
+    });
+
+    document.getElementById('tb-close').addEventListener('click', () => api.hide_panel());
+
+    // 标题栏区域双击 = 置顶切换，符合小工具习惯
+    document.querySelector('.tb-drag').addEventListener('dblclick', () => pin.click());
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') api.hide_panel();
+    });
+    return true;
+  }
+  // WebView2 可能恢复上次的滚动位置，内嵌模式下强制回到顶部
+  window.scrollTo(0, 0);
+  window.addEventListener('pywebviewready', () => { window.scrollTo(0, 0); init(); });
+  const t = setInterval(() => { if (init()) clearInterval(t); }, 200);
+  setTimeout(() => clearInterval(t), 4000);
+})();
+</script>
+</body>
+</html>

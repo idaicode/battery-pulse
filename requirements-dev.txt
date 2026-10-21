@@ -1,0 +1,6 @@
+# 开发依赖（运行依赖见 requirements.txt）
+-r requirements.txt
+
+pyinstaller>=6.0
+ruff>=0.6
+pytest>=8.0

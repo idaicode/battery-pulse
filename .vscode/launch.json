@@ -1,0 +1,38 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "面板 + 托盘",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}\\app.py",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "只起托盘",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}\\app.py",
+            "args": ["--tray"],
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "只起服务（浏览器调 UI）",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}\\app.py",
+            "args": ["--no-open"],
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "HID++ 探针",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}\\tools\\probe.py",
+            "console": "integratedTerminal"
+        }
+    ]
+}

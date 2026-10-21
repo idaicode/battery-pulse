@@ -1,0 +1,54 @@
+[project]
+name = "battery-pulse"
+version = "1.0.0"
+description = "读取罗技 HID++ / 蓝牙 GATT 外设真实电量的 Windows 托盘工具"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [{ name = "yogurt" }]
+keywords = ["battery", "logitech", "hidpp", "gatt", "tray", "windows", "pywebview"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Win32 (MS Windows)",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: Microsoft :: Windows :: Windows 10",
+    "Operating System :: Microsoft :: Windows :: Windows 11",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Utilities",
+]
+dependencies = [
+    "hidapi>=0.14",
+    "bleak>=0.22",
+    "pillow>=10.0",
+    "pywebview>=6.0",
+]
+
+[project.optional-dependencies]
+dev = ["pyinstaller>=6.0", "ruff>=0.6", "pytest>=8.0"]
+
+[project.urls]
+Homepage = "https://github.com/yogurt/battery-pulse"
+Issues = "https://github.com/yogurt/battery-pulse/issues"
+
+[tool.ruff]
+line-length = 110
+target-version = "py310"
+exclude = [".venv", "build", "dist", "data"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+ignore = [
+    "E501",  # 行宽交给 formatter
+    "B008",
+]
+
+[tool.ruff.lint.per-file-ignores]
+# 诊断/截图脚本：允许 print、慢导入、一行多语句、zip 不带 strict
+"tools/*" = ["E402", "F401", "B011", "E702", "B905", "B007", "I001"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

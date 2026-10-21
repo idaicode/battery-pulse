@@ -1,0 +1,60 @@
+name: Bug 反馈
+description: 图标不出现、电量读不到、面板唤不出等
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        先看 README 的「排错」一节，多数情况（图标被折叠到 `^`、RK98 在 2.4G 模式下读不到）在那里有解答。
+  - type: textarea
+    id: what
+    attributes:
+      label: 现象
+      description: 期望发生什么，实际发生了什么
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+      placeholder: |
+        1. 双击 tray-only.bat
+        2. 右键托盘图标
+        3. ...
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: 外设型号
+      placeholder: 罗技 G304 / RK98RGB 5.0 
+  - type: dropdown
+    id: form
+    attributes:
+      label: 运行方式
+      options:
+        - 源码运行（.bat）
+        - 打包后的 exe
+    validations:
+      required: true
+  - type: textarea
+    id: env
+    attributes:
+      label: 环境
+      description: Windows 版本、Python 版本、屏幕缩放比例（125% / 150%）、是否多显示器
+      placeholder: Windows 11 23H2 / Python 3.12 / 150% / 单屏
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: 日志或截图
+      description: 可以贴 `data/run_tray.log`，或跑 `tools/verify_tray.py` 的输出
+      render: shell
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 确认
+      options:
+        - label: 已经搜索过现有 issue
+          required: true

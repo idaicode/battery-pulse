@@ -1,0 +1,4 @@
+hidapi>=0.14
+bleak>=0.22
+pillow>=10.0
+pywebview>=6.0

@@ -5,7 +5,7 @@
 Windows 10/11 + Python 3.10 以上。不需要 Node、不需要前端构建工具——界面就是一个 html 文件。
 
 ```bat
-git clone https://github.com/yogurt/battery-pulse.git
+git clone https://github.com/idaicode/battery-pulse.git
 cd battery-pulse
 
 python -m venv .venv

@@ -5,7 +5,7 @@ description = "读取罗技 HID++ / 蓝牙 GATT 外设真实电量的 Windows �
 readme = "README.md"
 requires-python = ">=3.10"
 license = { file = "LICENSE" }
-authors = [{ name = "yogurt" }]
+authors = [{ name = "idaicode" }]
 keywords = ["battery", "logitech", "hidpp", "gatt", "tray", "windows", "pywebview"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
@@ -30,8 +30,8 @@ dependencies = [
 dev = ["pyinstaller>=6.0", "ruff>=0.6", "pytest>=8.0"]
 
 [project.urls]
-Homepage = "https://github.com/yogurt/battery-pulse"
-Issues = "https://github.com/yogurt/battery-pulse/issues"
+Homepage = "https://github.com/idaicode/battery-pulse"
+Issues = "https://github.com/idaicode/battery-pulse/issues"
 
 [tool.ruff]
 line-length = 110

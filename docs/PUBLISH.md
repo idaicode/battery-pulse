@@ -3,7 +3,7 @@
 这份文档假设你**没做过开源发布**，从"一堆能跑的代码"讲到"别人 clone 下来就能跑、能下载 exe"。
 每一步都给了可直接复制的命令。
 
-> 全文把 `yogurt` 当成你的 GitHub 用户名、`battery-pulse` 当成仓库名。
+> 全文用 `idaicode`（本项目的 GitHub 账号）和 `battery-pulse`（仓库名）举例。
 > 换成你自己的：GitHub 右上角头像就是用户名；仓库名建议就用 `battery-pulse`（小写 + 连字符，是 GitHub 的通行写法）。
 
 ---
@@ -165,12 +165,12 @@ chore:    杂活          chore: 升级 pyinstaller
 5. 回到终端：
 
 ```bat
-git remote add origin https://github.com/yogurt/battery-pulse.git
+git remote add origin https://github.com/idaicode/battery-pulse.git
 git push -u origin main
 ```
 
 弹窗里：
-- 用户名：`yogurt`
+- 用户名：`idaicode`
 - 密码：**粘贴那串 token**（不是账号密码）
 
 Windows 会用「凭据管理器」记住它，以后 push 不用再输。
@@ -196,9 +196,9 @@ clip < %USERPROFILE%\.ssh\id_ed25519.pub
 
 ```bat
 ssh -T git@github.com
-:: 看到 "Hi yogurt! You've successfully authenticated" 就成了
+:: 看到 "Hi idaicode! You've successfully authenticated" 就成了
 
-git remote add origin git@github.com:yogurt/battery-pulse.git
+git remote add origin git@github.com:idaicode/battery-pulse.git
 git push -u origin main
 ```
 
@@ -210,7 +210,7 @@ git push -u origin main
 
 ## 6. 推送成功后该看到什么
 
-刷新 `https://github.com/yogurt/battery-pulse`：
+刷新 `https://github.com/idaicode/battery-pulse`：
 
 - 首页自动渲染 `README.md`（截图能显示，因为 `shots/` 已经一起提交了）
 - 右上角显示 **MIT license**
@@ -258,7 +258,7 @@ git push origin v1.0.0
 5. 把 `release\BatteryPulse-v1.0.0-win64.zip` 拖进附件区（单文件上限 2 GB）
 6. `Publish release`
 
-发完后得到形如 `https://github.com/yogurt/battery-pulse/releases/latest` 的固定链接，可以放进 README 的下载按钮——以后发新版，这个链接永远指向最新版。
+发完后得到形如 `https://github.com/idaicode/battery-pulse/releases/latest` 的固定链接，可以放进 README 的下载按钮——以后发新版，这个链接永远指向最新版。
 
 ---
 
@@ -300,9 +300,9 @@ git push && git push origin v1.0.1
 可以再加的（都在 README 顶部）：
 
 ```markdown
-[![build](https://github.com/yogurt/battery-pulse/actions/workflows/build.yml/badge.svg)](https://github.com/yogurt/battery-pulse/actions/workflows/build.yml)
-[![release](https://img.shields.io/github/v/release/yogurt/battery-pulse)](https://github.com/yogurt/battery-pulse/releases/latest)
-[![license](https://img.shields.io/github/license/yogurt/battery-pulse)](LICENSE)
+[![build](https://github.com/idaicode/battery-pulse/actions/workflows/build.yml/badge.svg)](https://github.com/idaicode/battery-pulse/actions/workflows/build.yml)
+[![release](https://img.shields.io/github/v/release/idaicode/battery-pulse)](https://github.com/idaicode/battery-pulse/releases/latest)
+[![license](https://img.shields.io/github/license/idaicode/battery-pulse)](LICENSE)
 ```
 
 徽章不是装饰：`build` 徽章是绿的，说明这个项目当前是能构建的；`release` 徽章直接给出下载入口。

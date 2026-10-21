@@ -6,11 +6,11 @@
 
 Logitech HID++ 2.0 over a 2.4 GHz receiver · Bluetooth LE GATT · tray-first, ~16 MB idle
 
-[![build](https://github.com/yogurt/battery-pulse/actions/workflows/build.yml/badge.svg)](https://github.com/yogurt/battery-pulse/actions/workflows/build.yml)
-[![release](https://img.shields.io/github/v/release/yogurt/battery-pulse)](https://github.com/yogurt/battery-pulse/releases/latest)
-[![license](https://img.shields.io/github/license/yogurt/battery-pulse)](LICENSE)
+[![build](https://github.com/idaicode/battery-pulse/actions/workflows/build.yml/badge.svg)](https://github.com/idaicode/battery-pulse/actions/workflows/build.yml)
+[![release](https://img.shields.io/github/v/release/idaicode/battery-pulse)](https://github.com/idaicode/battery-pulse/releases/latest)
+[![license](https://img.shields.io/github/license/idaicode/battery-pulse)](LICENSE)
 [![python](https://img.shields.io/badge/python-3.10%2B-3776AB)](pyproject.toml)
-[![platform](https://img.shields.io/badge/platform-Windows%2010%20%7C%2011-0078D6)](https://github.com/yogurt/battery-pulse/releases/latest)
+[![platform](https://img.shields.io/badge/platform-Windows%2010%20%7C%2011-0078D6)](https://github.com/idaicode/battery-pulse/releases/latest)
 
 ![preview](shots/preview.png)
 
@@ -35,7 +35,7 @@ Battery Pulse talks to the devices directly — HID++ 2.0 for Logitech receivers
 
 ### Download
 
-Grab `BatteryPulse-v*-win64.zip` from [Releases](https://github.com/yogurt/battery-pulse/releases/latest),
+Grab `BatteryPulse-v*-win64.zip` from [Releases](https://github.com/idaicode/battery-pulse/releases/latest),
 unzip anywhere, run `BatteryPulse.exe`.
 
 Requires Windows 10/11 and the [WebView2 Runtime](https://developer.microsoft.com/microsoft-edge/webview2/)
@@ -75,8 +75,8 @@ release.bat    :: -> release\BatteryPulse-v<version>-win64.zip
 
 ### Author
 
-- Blog: [yogurt's blog](https://example.com) <!-- TODO: 换成真实博客地址 -->
-- GitHub: [@yogurt](https://github.com/yogurt)
+- Blog: [idaicode's blog](https://example.com) <!-- TODO: 换成真实博客地址 -->
+- GitHub: [@idaicode](https://github.com/idaicode)
 
 MIT licensed. Not affiliated with Logitech or Royal Kludge.
 
@@ -101,7 +101,7 @@ MIT licensed. Not affiliated with Logitech or Royal Kludge.
 
 ## 下载
 
-不想装 Python 的话，直接去 [Releases](https://github.com/yogurt/battery-pulse/releases/latest)
+不想装 Python 的话，直接去 [Releases](https://github.com/idaicode/battery-pulse/releases/latest)
 下 `BatteryPulse-v*-win64.zip`，解压后双击 `BatteryPulse.exe`。
 
 要求 Windows 10/11 + [WebView2 运行时](https://developer.microsoft.com/microsoft-edge/webview2/)（Win11 与装过新版 Edge 的 Win10 都已自带）。
@@ -242,8 +242,8 @@ battery-pulse/
 
 ## 关于作者
 
-- 博客：[yogurt 的博客](https://example.com) <!-- TODO: 换成真实博客地址 -->
-- GitHub：[@yogurt](https://github.com/yogurt)
+- 博客：[idaicode 的博客](https://example.com) <!-- TODO: 换成真实博客地址 -->
+- GitHub：[@idaicode](https://github.com/idaicode)
 
 如果这个工具帮到了你，点个 Star 就是最好的支持。
 

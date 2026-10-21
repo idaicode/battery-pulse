@@ -179,7 +179,7 @@ battery-pulse/
 ## 关于作者
 
 - 博客：[口袋分享记](https://111620.xyz)
-- GitHub：[@idaicode](https://github.com/idaicode)
+- GitHub：[yogurt](https://github.com/idaicode)
 
 如果这个工具帮到了你，点个 Star 就是最好的支持。
 
@@ -249,6 +249,6 @@ release.bat    :: -> release\BatteryPulse-v<version>-win64.zip
 ### Author
 
 - Blog: [口袋分享记](https://111620.xyz)
-- GitHub: [@idaicode](https://github.com/idaicode)
+- GitHub: [yogurt](https://github.com/idaicode)
 
 MIT licensed. Not affiliated with Logitech or Royal Kludge.

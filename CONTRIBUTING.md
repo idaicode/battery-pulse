@@ -54,6 +54,14 @@ docs: 补充 RK98 在 2.4G 模式下的限制
 chore: 升级 pyinstaller
 ```
 
+三种提交方式，任选：
+
+| 方式 | 操作 |
+|---|---|
+| VS Code 图形界面 | 左侧「源代码管理」→ 填消息 → `Ctrl+Enter` 提交（仓库已配置提交后自动推送） |
+| 命令行 | `git add -A && git commit -m "..." && git push` |
+| 双击脚本 | `push.bat`（自动生成带时间戳的消息）或 `push.bat "fix: xxx"` |
+
 提交前跑：
 
 ```bat

@@ -1,6 +1,10 @@
 {
     "python.defaultInterpreterPath": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
     "python.terminal.activateEnvironment": true,
+    "git.autofetch": true,
+    "git.postCommitCommand": "sync",
+    "git.confirmSync": false,
+    "git.showPushSuccessNotification": true,
     "files.encoding": "utf8",
     "files.eol": "\n",
     "[bat]": {

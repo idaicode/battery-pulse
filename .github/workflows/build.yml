@@ -34,7 +34,7 @@ jobs:
       - name: 读取版本号
         id: ver
         shell: bash
-        run: echo "value=$(python -c "from core import __version__; print(__version__)")" >> "$GITHUB_OUTPUT"
+        run: echo "value=$(python -c 'from core import __version__; print(__version__)')" >> "$GITHUB_OUTPUT"
 
       - name: PyInstaller 打包
         run: python -m PyInstaller --noconfirm --clean battery-monitor.spec

@@ -2,7 +2,9 @@
 
 # Battery Pulse
 
-**Read the real battery level of wireless mice and keyboards on Windows.**
+**读取无线键鼠真实电量的 Windows 小工具**
+
+Read the real battery level of wireless mice and keyboards on Windows.
 
 Logitech HID++ 2.0 over a 2.4 GHz receiver · Bluetooth LE GATT · tray-first, ~16 MB idle
 
@@ -12,79 +14,15 @@ Logitech HID++ 2.0 over a 2.4 GHz receiver · Bluetooth LE GATT · tray-first, ~
 [![python](https://img.shields.io/badge/python-3.10%2B-3776AB)](pyproject.toml)
 [![platform](https://img.shields.io/badge/platform-Windows%2010%20%7C%2011-0078D6)](https://github.com/idaicode/battery-pulse/releases/latest)
 
-![preview](shots/preview.png)
+![预览](shots/preview.png)
 
-[English](#english) · [中文](#中文)
+[中文](#中文) · [English](#english)
 
 </div>
 
 ---
 
-## English
-
-Most "battery" utilities only read the system battery driver, so they see nothing for wireless peripherals.
-Battery Pulse talks to the devices directly — HID++ 2.0 for Logitech receivers, BLE GATT for Bluetooth keyboards.
-
-| | |
-|---|---|
-| **Two shapes** | A frameless WebView2 panel (default), or tray-only at ~16 MB RSS |
-| **Per-device tray icons** | Cream rounded card + dark percentage + status-coloured bar |
-| **Real numbers** | G304 reports 90% straight from `feature 0x1000`, not a driver guess |
-| **Graded alerts** | Warn at 20%, critical at 10%, with quiet periods and recovery hysteresis |
-| **Zero console** | Ships as a standalone folder; no Python needed on the target machine |
-
-### Download
-
-Grab `BatteryPulse-v*-win64.zip` from [Releases](https://github.com/idaicode/battery-pulse/releases/latest),
-unzip anywhere, run `BatteryPulse.exe`.
-
-Requires Windows 10/11 and the [WebView2 Runtime](https://developer.microsoft.com/microsoft-edge/webview2/)
-(preinstalled on Windows 11 and on Windows 10 with a modern Edge).
-
-### Supported devices
-
-| Link | Status | Notes |
-|---|---|---|
-| Logitech HID++ 2.0 (2.4 GHz receiver) | ✅ tested on G304 | Any device exposing `feature 0x1000` |
-| Bluetooth LE GATT `0x180F` / `0x2A19` | ✅ tested on RK98 | Standard Battery Service |
-| Vendor 2.4 GHz dongles (SINOWEALTH etc.) | ❌ not possible | The dongle only forwards HID keyboard reports; no battery page is exposed |
-
-Run `python tools/probe.py` to see whether a new Logitech device exposes the battery feature.
-
-### Run from source
-
-```bat
-python -m venv .venv
-.venv\Scripts\python.exe -m pip install -r requirements.txt
-.venv\Scripts\pythonw.exe app.py
-```
-
-### Build
-
-```bat
-build.bat      :: -> dist\BatteryPulse\BatteryPulse.exe
-release.bat    :: -> release\BatteryPulse-v<version>-win64.zip
-```
-
-### Documentation
-
-- [Implementation notes](docs/ARCHITECTURE.md) — protocol details, DPI traps, a deadlock worth reading about
-- [Contributing](CONTRIBUTING.md)
-- [Publishing / CI](docs/PUBLISH.md)
-- [Changelog](CHANGELOG.md)
-
-### Author
-
-- Blog: [idaicode's blog](https://example.com) <!-- TODO: 换成真实博客地址 -->
-- GitHub: [@idaicode](https://github.com/idaicode)
-
-MIT licensed. Not affiliated with Logitech or Royal Kludge.
-
----
-
 <a id="中文"></a>
-
-## 中文
 
 直接读取无线键鼠**真实电量**的 Windows 小工具。两种运行形态：
 
@@ -92,8 +30,6 @@ MIT licensed. Not affiliated with Logitech or Royal Kludge.
 - **托盘常驻**：每只设备一个图标，右键是自绘弹层菜单，内存约 16 MB（自启用这个）
 
 低于阈值弹系统通知。零控制台窗口，可以打包成不依赖 Python 的 exe。
-
-![预览](shots/preview.png)
 
 ![托盘图标](shots/icons.png)
 
@@ -242,7 +178,7 @@ battery-pulse/
 
 ## 关于作者
 
-- 博客：[idaicode 的博客](https://example.com) <!-- TODO: 换成真实博客地址 -->
+- 博客：[口袋分享记](https://111620.xyz)
 - GitHub：[@idaicode](https://github.com/idaicode)
 
 如果这个工具帮到了你，点个 Star 就是最好的支持。
@@ -250,3 +186,69 @@ battery-pulse/
 ## 许可
 
 [MIT](LICENSE)。与罗技（Logitech）、RK（Royal Kludge）无隶属关系，商标归各自所有者。
+
+---
+
+<a id="english"></a>
+
+## English
+
+Most "battery" utilities only read the system battery driver, so they see nothing for wireless peripherals.
+Battery Pulse talks to the devices directly — HID++ 2.0 for Logitech receivers, BLE GATT for Bluetooth keyboards.
+
+| | |
+|---|---|
+| **Two shapes** | A frameless WebView2 panel (default), or tray-only at ~16 MB RSS |
+| **Per-device tray icons** | Cream rounded card + dark percentage + status-coloured bar |
+| **Real numbers** | G304 reports 90% straight from `feature 0x1000`, not a driver guess |
+| **Graded alerts** | Warn at 20%, critical at 10%, with quiet periods and recovery hysteresis |
+| **Zero console** | Ships as a standalone folder; no Python needed on the target machine |
+
+![Tray icons](shots/icons.png)
+
+### Download
+
+Grab `BatteryPulse-v*-win64.zip` from [Releases](https://github.com/idaicode/battery-pulse/releases/latest),
+unzip anywhere, run `BatteryPulse.exe`.
+
+Requires Windows 10/11 and the [WebView2 Runtime](https://developer.microsoft.com/microsoft-edge/webview2/)
+(preinstalled on Windows 11 and on Windows 10 with a modern Edge).
+
+### Supported devices
+
+| Link | Status | Notes |
+|---|---|---|
+| Logitech HID++ 2.0 (2.4 GHz receiver) | ✅ tested on G304 | Any device exposing `feature 0x1000` |
+| Bluetooth LE GATT `0x180F` / `0x2A19` | ✅ tested on RK98 | Standard Battery Service |
+| Vendor 2.4 GHz dongles (SINOWEALTH etc.) | ❌ not possible | The dongle only forwards HID keyboard reports; no battery page is exposed |
+
+Run `python tools/probe.py` to see whether a new Logitech device exposes the battery feature.
+
+### Run from source
+
+```bat
+python -m venv .venv
+.venv\Scripts\python.exe -m pip install -r requirements.txt
+.venv\Scripts\pythonw.exe app.py
+```
+
+### Build
+
+```bat
+build.bat      :: -> dist\BatteryPulse\BatteryPulse.exe
+release.bat    :: -> release\BatteryPulse-v<version>-win64.zip
+```
+
+### Documentation
+
+- [Implementation notes](docs/ARCHITECTURE.md) — protocol details, DPI traps, a deadlock worth reading about
+- [Contributing](CONTRIBUTING.md)
+- [Publishing / CI](docs/PUBLISH.md)
+- [Changelog](CHANGELOG.md)
+
+### Author
+
+- Blog: [口袋分享记](https://111620.xyz)
+- GitHub: [@idaicode](https://github.com/idaicode)
+
+MIT licensed. Not affiliated with Logitech or Royal Kludge.

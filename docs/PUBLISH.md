@@ -338,3 +338,57 @@ git push && git push origin v1.0.1
 ```
 
 到这里，这个项目就同时具备了：可读的源码、可复现的环境、可下载的成品、可追踪的变更记录、可协作的入口。
+
+---
+
+## 附录 A：两条路线，你走的是哪条
+
+网上多数教程（包括 CSDN 上那些"VSCode 同步到 GitHub"）走的是 **clone 路线**：
+
+```
+GitHub 建仓（可以勾 README）
+   └─ VSCode: Ctrl+Shift+P → Git: 克隆 → 填 URL → 选本地文件夹
+        └─ 在克隆出来的空目录里新建代码
+             └─ 源代码管理 → 提交 → 点「同步更改」
+```
+
+本文走的是 **push 路线**：
+
+```
+本地已经有能跑的代码
+   └─ 写 .gitignore（先在本地挡住 venv/dist/data）
+        └─ git init → add → commit
+             └─ GitHub 建「空」仓 → remote add → push
+```
+
+| | clone 路线 | push 路线（本文） |
+|---|---|---|
+| 起点 | 远端先有仓库 | 本地先有代码 |
+| 适合 | 从零开始的新项目 | **代码已经在本机跑起来了** |
+| 已有代码怎么办 | 要手动挪进克隆目录，容易连 `.venv`、`dist` 一起带进去 | 原地 `git init`，什么都不用搬 |
+| `.gitignore` | 教程通常不提 | 第一步就配，避免把 65 MB 依赖和本机 MAC 传上去 |
+| 版本发布 | 只有代码 | tag + Release 附件 + CI 自动打包 |
+
+**如果你的代码已经在本地跑通了，用 push 路线。** 反过来，如果只是想在 GitHub 上开个新坑写点东西，clone 路线更省事。
+
+## 附录 B：HTTPS + PAT 与 SSH 怎么选
+
+两者只是"证明你是你"的方式不同，传输的内容完全一样，安全性也相当。
+
+| | HTTPS + PAT | SSH |
+|---|---|---|
+| 原理 | 每次连接带一枚令牌，由系统凭据管理器保存 | 本地生成一对密钥，公钥登记在 GitHub，私钥留本机 |
+| 首次配置 | 网页生成 token（`ghp_...`，勾 `repo`），push 时当密码粘贴一次 | `ssh-keygen -t ed25519` → 把 `.pub` 内容贴到 GitHub |
+| 之后 | 免密（凭据已记住） | 天生免密 |
+| 换机器 | 要重新生成 / 搬 token | 复制 `~/.ssh` 或重新生成 |
+| 撤销 | 网页 Revoke，立刻失效 | 删掉那把公钥 |
+| 适合 | 新手、偶尔推一次 | 长期开发、多仓库、多机器 |
+
+**Git Bash 不是第三种认证方式**，它是 Windows 上的一个终端程序（Git for Windows 自带），提供 `ls`、`cat`、`ssh-keygen`、`clip` 这些 Linux 风格命令。它和 cmd、PowerShell 是并列关系——决定你"在哪敲命令"；HTTPS/SSH 决定你"怎么证明身份"。这两件事常被教程并列着说，其实是两个维度。
+
+在本项目里：
+
+- `.bat` 是 cmd 脚本，双击运行最省事；在 Git Bash 里要写 `cmd //c start.bat`
+- `ssh-keygen`、`clip` 这类命令在 Git Bash 里更顺；PowerShell 里 `clip` 也自带
+- VS Code 里换终端：终端面板右上角下拉 → `Select Default Profile` → Git Bash
+
